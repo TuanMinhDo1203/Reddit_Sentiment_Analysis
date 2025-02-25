@@ -2,7 +2,7 @@ import praw
 import pandas as pd
 from datetime import datetime
 
-def init_reddit():
+def init_reddit():                 #### Hàm khởi tạo Reddit API
     return praw.Reddit(
         client_id="3Lk6D3zzN-6VJ91Qw8-WUQ",
         client_secret="TsHTQgd2Pic6bT6qzippkLmqrPKZYw",
@@ -10,15 +10,15 @@ def init_reddit():
         request_timeout=90
     )
 
-def load_dataframe(filename):
+def load_dataframe(filename):       #### Hàm load dữ liệu từ file csv
     df = pd.read_csv(filename)
     df["DateTime"] = pd.to_datetime(df["utc_date"], format="%Y-%m-%d %H:%M:%S")
     return df
 
-def clean_team_name(team_name):
+def clean_team_name(team_name):   #### Hàm xử lý tên đội bóng
     return team_name.replace("FC", "").strip()
 
-def search_match_threads(reddit, df_matches, max_matchday=19):
+def search_match_threads(reddit, df_matches, max_matchday=19):  #### Hàm tìm các bài post trên Reddit
     posts = []
     
     for _, row in df_matches.iterrows():
@@ -50,7 +50,7 @@ def search_match_threads(reddit, df_matches, max_matchday=19):
 
 
 
-def find_missing_matches(df_original, df_posts):
+def find_missing_matches(df_original, df_posts):  #### Hàm tìm các trận đấu chưa có bài post
     """
     Tìm các trận đấu trong df_matches nhưng không có trong df_posts.
     
@@ -85,6 +85,14 @@ def find_missing_matches(df_original, df_posts):
     # return df_missing.sort_values(by="matchday").loc[df_missing["matchday"] <= 19] 
     return df_missing.sort_values(by="matchday")
 
+
+
+def unique_matches(df_matches):  #### Hàm đếm số cặp trận unique
+
+    num_unique_matches = df_matches[['home_team', 'away_team']].drop_duplicates().shape[0]
+    print(f"Số cặp trận unique: {num_unique_matches}")
+
+    return num_unique_matches
 
 
 def save_to_csv(df, filename):
