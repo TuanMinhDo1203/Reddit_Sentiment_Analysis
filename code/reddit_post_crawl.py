@@ -48,6 +48,45 @@ def search_match_threads(reddit, df_matches, max_matchday=19):
     
     return pd.DataFrame(posts)
 
+
+
+def find_missing_matches(df_original, df_posts):
+    """
+    Tìm các trận đấu trong df_matches nhưng không có trong df_posts.
+    
+    Parameters:
+        df_original (pd.DataFrame): DataFrame gốc.
+        df_posts (pd.DataFrame): DataFrame chứa danh sách các trận đã có bài đăng trên Reddit.
+    
+    Returns:
+        pd.DataFrame: DataFrame chứa các trận chưa có bài đăng.
+    """
+    def clean_team_name(team_name):
+        return team_name.replace("FC", "").strip()
+
+    # Tạo tập hợp các trận đã có bài post
+    collected_matches = set(zip(df_posts["home_team"], df_posts["away_team"]))
+
+    # Tạo tập hợp tất cả trận đấu từ file gốc
+    all_matches = set(zip(
+        df_original["home_team"].apply(clean_team_name), 
+        df_original["away_team"].apply(clean_team_name), 
+        df_original["matchday"], 
+        df_original["utc_date"]
+    ))
+
+    # Tìm các trận chưa có bài post
+    missing_matches = [match for match in all_matches if (match[0], match[1]) not in collected_matches]
+
+    # Chuyển danh sách trận chưa có post thành DataFrame
+    df_missing = pd.DataFrame(missing_matches, columns=["home_team", "away_team", "matchday", "utc_date"])
+
+    # Sắp xếp theo matchday và lọc các trận trong vòng 19 vòng đầu
+    # return df_missing.sort_values(by="matchday").loc[df_missing["matchday"] <= 19] 
+    return df_missing.sort_values(by="matchday")
+
+
+
 def save_to_csv(df, filename):
     df.to_csv(filename, index=False)
 
