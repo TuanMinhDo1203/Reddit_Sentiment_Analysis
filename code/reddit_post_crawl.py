@@ -52,7 +52,7 @@ def search_match_threads(reddit, df_matches, max_matchday=19):  #### Hàm tìm c
 
 def find_missing_matches(df_original, df_posts):  #### Hàm tìm các trận đấu chưa có bài post
     """
-    Tìm các trận đấu trong df_matches nhưng không có trong df_posts.
+    Tìm các trận đấu trong df_original nhưng không có trong df_posts.
     
     Parameters:
         df_original (pd.DataFrame): DataFrame gốc.
