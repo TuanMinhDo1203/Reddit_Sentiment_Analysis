@@ -18,7 +18,7 @@ def load_dataframe(filename):       #### Hàm load dữ liệu từ file csv
 def clean_team_name(team_name):   #### Hàm xử lý tên đội bóng
     return team_name.replace("FC", "").strip()
 
-def search_match_threads(reddit, df_matches, max_matchday=19):  #### Hàm tìm các bài post trên Reddit
+def search_match_threads(reddit, df_matches, max_matchday=19):  #### Hàm tìm các bài post trên Reddit có giới hạn ngày
     posts = []
     
     for _, row in df_matches.iterrows():
@@ -48,7 +48,33 @@ def search_match_threads(reddit, df_matches, max_matchday=19):  #### Hàm tìm c
     
     return pd.DataFrame(posts)
 
+def match_searcher(reddit, home_team, away_team, match_date, sort="relevance", time_filter="year"):  #### Hàm tìm các bài post trên Reddit có thêm thông số linh hoạt hơn
+    posts = []
+    
+    home_team_cleaned = clean_team_name(home_team)
+    away_team_cleaned = clean_team_name(away_team)
 
+    search_query = f"(Author:MatchThreadder {home_team_cleaned} vs {away_team_cleaned}) OR ({home_team_cleaned} v {away_team_cleaned})"
+    
+    for submission in reddit.subreddit("soccer").search(search_query, sort=sort, time_filter=time_filter):
+        post_date = datetime.utcfromtimestamp(submission.created_utc)
+        time_diff = (post_date - match_date).total_seconds() / 3600  # time difference in hours
+        
+        if "Match Thread" in submission.title:
+            posts.append({
+                "home_team": home_team_cleaned,
+                "away_team": away_team_cleaned,
+                "match_date": match_date.strftime('%Y-%m-%d %H:%M'),
+                "post_date": post_date.strftime('%Y-%m-%d %H:%M'),
+                "time_diff_hours": time_diff,
+                "title": submission.title,
+                "url": submission.url,
+                "upvotes": submission.score,
+                "comments": submission.num_comments,
+                "submission_id": submission.id
+            })
+    
+    return pd.DataFrame(posts)
 
 def find_missing_matches(df_original, df_posts):  #### Hàm tìm các trận đấu chưa có bài post
     """
