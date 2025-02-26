@@ -2,11 +2,11 @@ import praw
 import pandas as pd
 from datetime import datetime
 
-def init_reddit():                 #### Hàm khởi tạo Reddit API
+def init_reddit(client_id, client_secret, user_agent):  #### Hàm khởi tạo Reddit API với thông tin bảo mật
     return praw.Reddit(
-        client_id="3Lk6D3zzN-6VJ91Qw8-WUQ",
-        client_secret="TsHTQgd2Pic6bT6qzippkLmqrPKZYw",
-        user_agent="Ok-Bill-8363",
+        client_id=client_id,
+        client_secret=client_secret,
+        user_agent=user_agent,
         request_timeout=90
     )
 
@@ -31,7 +31,7 @@ def search_match_threads(reddit, df_matches, max_matchday=19):  #### Hàm tìm c
         
         if match_day <= max_matchday:
             for submission in reddit.subreddit("soccer").search(search_query, sort="relevance", time_filter="year"):
-                post_date = datetime.utcfromtimestamp(submission.created_utc)
+                post_date = datetime.fromtimestamp(submission.created_utc)
                 
                 if abs((post_date - match_time).total_seconds()) <= 7200 and "Match Thread" in submission.title:
                     posts.append({
