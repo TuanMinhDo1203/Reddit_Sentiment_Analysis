@@ -57,7 +57,7 @@ def match_searcher(reddit, home_team, away_team, match_date, sort="relevance", t
     search_query = f"(Author:MatchThreadder {home_team_cleaned} vs {away_team_cleaned}) OR ({home_team_cleaned} v {away_team_cleaned})"
     
     for submission in reddit.subreddit("soccer").search(search_query, sort=sort, time_filter=time_filter):
-        post_date = datetime.utcfromtimestamp(submission.created_utc)
+        post_date = datetime.fromtimestamp(submission.created_utc)
         time_diff = (post_date - match_date).total_seconds() / 3600  # time difference in hours
         
         if "Match Thread" in submission.title:
