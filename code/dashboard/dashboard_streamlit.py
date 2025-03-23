@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from streamlit_option_menu import option_menu
+import match_page
 # Load dummy data (thay bằng dữ liệu thực)
 df = pd.DataFrame({
     'match': ['Match 1', 'Match 1', 'Match 2', 'Match 2'],
@@ -46,19 +47,7 @@ if page == "Tổng quan":
 
 # Trang 2: Sentiment theo trận
 elif page == "Sentiment Trận đấu":
-    st.title("Sentiment theo Trận")
-
-    selected_match = st.selectbox("Chọn trận đấu:", df['match'].unique())
-
-    match_data = df_info[df_info['match'] == selected_match].iloc[0]
-    st.write(f"📅 **Ngày diễn ra:** {match_data['date']}")
-    st.write(f"📍 **Địa điểm:** {match_data['location']}")
-    st.write(f"💬 **Tổng số bình luận:** {match_data['total_comments']}")
-
-    filtered_df = df[df['match'] == selected_match]
-    fig = px.bar(filtered_df, x='team', y='count', color='sentiment', barmode='group',
-                 title=f'Sentiment for {selected_match}')
-    st.plotly_chart(fig)
+    match_page.display_match_sentiment()
 
 # Trang 3: Chi tiết post & comment
 elif page == "Chi tiết Post & Comment":
