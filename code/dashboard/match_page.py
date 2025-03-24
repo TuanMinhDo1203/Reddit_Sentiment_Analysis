@@ -10,13 +10,13 @@ from io import BytesIO
 from PIL import Image
 @st.cache_data
 def load_match_data():
-    df_match = pd.read_csv(r"C:\Users\DO TUAN MINH\Desktop\ben\Learn\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_match_data.csv")
+    df_match = pd.read_csv("nonan_goodformat_match_data.csv")
     df_match["Date"] = pd.to_datetime(df_match["Date"])
     return df_match
 
 @st.cache_data
 def load_sentiment_data():
-    df_sentiment = pd.read_csv(r"C:\Users\DO TUAN MINH\Desktop\ben\Learn\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_comment_data.csv")
+    df_sentiment = pd.read_csv("nonan_goodformat_match_data.csv")
     df_sentiment["match_time"] = pd.to_datetime(df_sentiment["match_time"])
     return df_sentiment
 
@@ -303,14 +303,29 @@ def display_match_sentiment():
 
     st.title("📊 Sentiment Trận đấu")
     
-    selected_match = st.selectbox("Chọn trận đấu:", df_match["home_team"] + " vs " + df_match["away_team"])
+    # Requirement: Select matchday first
+    matchdays = sorted(df_match["matchday"].unique())
+    selected_matchday = st.selectbox("Chọn vòng đấu:", matchdays)
+    
+    # Filter matches by selected matchday
+    matches_in_matchday = df_match[df_match["matchday"] == selected_matchday]
+    match_options = matches_in_matchday["home_team"] + " vs " + matches_in_matchday["away_team"]
+    selected_match = st.selectbox("Chọn trận đấu:", match_options)
     
     home_team, away_team = selected_match.split(" vs ")
     match_info = df_match[(df_match["home_team"] == home_team) & (df_match["away_team"] == away_team)]
     match_comments = df_sentiment[(df_sentiment["home_team"] == home_team) & (df_sentiment["away_team"] == away_team)]
 
+    # Existing match info and stats display
     display_match_info(match_info)
     display_match_stats(match_info)
+
+    # Requirement: Display sentiment for the match
+    st.subheader("Sentiment của Trận đấu")
+    sentiment_summary = match_comments.groupby('Sentiment').size().reset_index(name='count')
+    fig = px.bar(sentiment_summary, x='Sentiment', y='count', 
+                 title=f"Sentiment Distribution for {selected_match}")
+    st.plotly_chart(fig)
 
     st.subheader("Bình luận về trận đấu:")
     st.dataframe(match_comments[["comment_text", "Sentiment", "Compound"]])
