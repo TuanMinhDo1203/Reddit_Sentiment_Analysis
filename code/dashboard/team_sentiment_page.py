@@ -6,6 +6,13 @@ import matplotlib.image as mpimg
 import numpy as np
 
 def display_team_sentiment(dfs):
+    # Debug: Check available columns
+    required_columns = ['matchday', 'home_team', 'away_team', 'Sentiment', 'Compound']
+    missing_columns = [col for col in required_columns if col not in dfs.columns]
+    if missing_columns:
+        st.error(f"Error: The following required columns are missing in the dataset: {missing_columns}. Available columns: {dfs.columns.tolist()}")
+        st.stop()
+
     st.title("Sentiment Đội Bóng")
 
     # Requirement 3: Ranking Đội theo Sentiment (At the top)
@@ -221,8 +228,8 @@ def display_team_sentiment(dfs):
 
         ax.set_xticks(x_positions)
         ax.set_xticklabels(sentiments)
-        ax.set_title(f"Sentiment Distribution for {team}").set_color('#FF694B')
-        ax.set_xlabel("Sentiment").set_color('#FF694B')
+        ax.set_title(f"Sentiment Distribution for {team}").set_color('#FF69B4')
+        ax.set_xlabel("Sentiment").set_color('#FF69B4')
         ax.set_ylabel(y_title)
         ax.set_facecolor('#1E1E1E')  # Match the dark theme
         fig.patch.set_facecolor('#1E1E1E')
