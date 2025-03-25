@@ -294,45 +294,6 @@ def display_team_sentiment(dfs: pd.DataFrame) -> None:
 
     st.title("EPL Team Sentiment Analysis")
 
-    # Sidebar for Filters
-    with st.sidebar:
-        st.header("Filters")
-        teams = pd.concat([dfs['home_team'], dfs['away_team']]).unique()
-        selected_teams = st.multiselect(
-            "Select teams to compare:", 
-            teams, 
-            default=teams[:2] if len(teams) > 1 else teams[0:1],
-            key='team_selector'
-        )
-        
-        sentiments = ['Positive', 'Negative', 'Neutral']
-        selected_sentiments = st.multiselect(
-            "Select sentiments:", 
-            sentiments, 
-            default=sentiments,
-            key='sentiment_selector'
-        )
-        
-        matchdays = sorted(dfs['matchday'].unique())
-        if len(matchdays) > 1:
-            matchday_range = st.slider(
-                "Select matchday range:", 
-                min_value=int(min(matchdays)), 
-                max_value=int(max(matchdays)), 
-                value=(int(min(matchdays)), int(max(matchdays))),
-                key='matchday_slider'
-            )
-            start_matchday, end_matchday = matchday_range
-        else:
-            st.write("Only one matchday available.")
-            start_matchday, end_matchday = matchdays[0], matchdays[0]
-
-    # Filter data
-    team_data = filter_data(dfs, selected_teams, selected_sentiments, start_matchday, end_matchday)
-
-    if not selected_teams:
-        st.warning("Please select at least one team")
-        return
 
     # Display mode selector
     display_mode = st.radio(
@@ -345,6 +306,47 @@ def display_team_sentiment(dfs: pd.DataFrame) -> None:
 
     # Create ranking table
     create_ranking_table(dfs)  # Using full dataset for ranking
+    # Sidebar for Filters
+    st.subheader("Team Performance Metrics")
+    teams = pd.concat([dfs['home_team'], dfs['away_team']]).unique()
+    selected_teams = st.multiselect(
+        "Select teams:", 
+        teams, 
+        default=teams[:2] if len(teams) > 1 else teams[0:1],
+        key='team_selector'
+    )
+
+    sentiments = ['Positive', 'Negative', 'Neutral']
+    selected_sentiments = st.multiselect(
+        "Select sentiments:", 
+        sentiments, 
+        default=sentiments,
+        key='sentiment_selector'
+    )
+
+    matchdays = sorted(dfs['matchday'].unique())
+    if len(matchdays) > 1:
+        matchday_range = st.slider(
+            "Select matchday range:", 
+            min_value=int(min(matchdays)), 
+            max_value=int(max(matchdays)), 
+            value=(int(min(matchdays)), int(max(matchdays))),
+            key='matchday_slider'
+        )
+        start_matchday, end_matchday = matchday_range
+    else:
+        st.write("Only one matchday available.")
+        start_matchday, end_matchday = matchdays[0], matchdays[0]
+
+
+    # Filter data
+    team_data = filter_data(dfs, selected_teams, selected_sentiments, start_matchday, end_matchday)
+
+    if not selected_teams:
+        st.warning("Please select at least one team")
+        return
+
+    
 
     # Team performance metrics
     st.subheader("Team Performance Metrics")
