@@ -7,25 +7,37 @@ import team_sentiment_page
 import base64
 import os
 
-# Load the dataset with caching
+# Load the sentiment dataset with caching
 @st.cache_data
-def load_data():
-    # Update this path to match your system
-    df = pd.read_csv("path/to/full_comments_sentiment_updated.csv")
-    # Convert match_time to datetime
-    df["match_time"] = pd.to_datetime(df["match_time"])
-    return df
+def load_sentiment_data():
+    df_sentiment = pd.read_csv(r"Z:\Coding_II\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_comment_data.csv")
+    df_sentiment["match_time"] = pd.to_datetime(df_sentiment["match_time"])
+    return df_sentiment
+
+# Load the match dataset with caching
+@st.cache_data
+def load_match_data():
+    df_match = pd.read_csv(r"Z:\Coding_II\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_match_data.csv")
+    df_match["Date"] = pd.to_datetime(df_match["Date"])
+    return df_match
 
 st.set_page_config(page_title="Football Sentiment Analysis", layout="wide")
 
-# Load data and assign to dfs
-dfs = load_data()
+# Load data
+df = load_sentiment_data()
+df_match = load_match_data()
+dfs = load_sentiment_data()
+
+# Debug: Check if 'matchday' column exists
+if 'matchday' not in dfs.columns:
+    st.error("Error: 'matchday' column not found in the dataset. Available columns: " + str(dfs.columns.tolist()))
+    st.stop()
 
 def add_snowfall_effect():
     # Check if the image exists
     image_path = 'Suomi.png'
     if not os.path.exists(image_path):
-        st.warning("Image not found. Snowfall effect will use a default image.")
+        st.warning("Image 'Suomi.png' not found. Snowfall effect will use a default image.")
         snowflake_image = "https://via.placeholder.com/30"  # Fallback image
     else:
         with open(image_path, "rb") as image_file:
@@ -115,7 +127,7 @@ page = option_menu(
 # Page 1: Tổng quan
 if page == "Tổng quan":
     st.title("Tổng quan Sentiment")
-    sentiment_by_match = dfs.groupby(['match', 'Sentiment']).size().reset_index(name='count')
+    sentiment_by_match = df.groupby(['match', 'Sentiment']).size().reset_index(name='count')
     fig = px.bar(sentiment_by_match, x='match', y='count', color='Sentiment', 
                  barmode='group', title="Sentiment Distribution Across Matches")
     st.plotly_chart(fig)
@@ -128,8 +140,8 @@ elif page == "Sentiment Trận đấu":
 elif page == "Chi tiết Post & Comment":
     st.title("Chi tiết Bài Post & Comment")
     st.subheader("Danh sách Post và Comment")
-    st.dataframe(dfs[['post_id', 'comment_id', 'comment', 'comment_author', 'Sentiment', 'Compound']])
+    st.dataframe(df[['post_id', 'comment_id', 'comment', 'comment_author', 'Sentiment', 'Compound']])
 
 # Page 4: Sentiment Đội Bóng
 elif page == "Sentiment Đội Bóng":
-    team_sentiment_page.display_team_sentiment(dfs)  # Call the function from the new module
+    team_sentiment_page.display_team_sentiment(dfs)
