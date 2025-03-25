@@ -8,7 +8,7 @@ from wordcloud import WordCloud
 import re
 import google.generativeai as genai
 import time
-API_KEY = "AIzaSyCPaztwbDpbUlayehCkr0qZkVKFJXinAeU"
+API_KEY = "ben"
 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-pro-latest")

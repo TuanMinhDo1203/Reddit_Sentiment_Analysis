@@ -7,7 +7,7 @@ import streamlit.components.v1 as components
 import google.generativeai as genai
 
 # Cấu hình API
-API_KEY = "AIzaSyCPaztwbDpbUlayehCkr0qZkVKFJXinAeU"
+API_KEY = "ben"
 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash-latest")
