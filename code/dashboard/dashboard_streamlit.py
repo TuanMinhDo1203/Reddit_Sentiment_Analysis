@@ -6,18 +6,24 @@ import match_page
 import team_sentiment_page
 import base64
 import os
+from pathlib import Path
+
 
 # Load the sentiment dataset with caching
 @st.cache_data
 def load_sentiment_data():
-    df_sentiment = pd.read_csv(r"Z:\Coding_II\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_comment_data.csv")
+    file_path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_comment_data.csv")
+    df_sentiment = pd.read_csv(file_path)
     df_sentiment["match_time"] = pd.to_datetime(df_sentiment["match_time"])
     return df_sentiment
+import os
+print(os.getcwd())  # In ra thư mục hiện tại
 
 # Load the match dataset with caching
 @st.cache_data
 def load_match_data():
-    df_match = pd.read_csv(r"Z:\Coding_II\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_match_data.csv")
+    file_path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_match_data.csv")
+    df_match = pd.read_csv(file_path)
     df_match["Date"] = pd.to_datetime(df_match["Date"])
     return df_match
 
@@ -35,7 +41,9 @@ if 'matchday' not in dfs.columns:
 
 def add_snowfall_effect():
     # Check if the image exists
-    image_path = 'Suomi.png'
+    
+    image_path = Path("Reddit_Sentiment_Analysis/code/dashboard/Suomi.png")
+     
     if not os.path.exists(image_path):
         st.warning("Image 'Suomi.png' not found. Snowfall effect will use a default image.")
         snowflake_image = "https://via.placeholder.com/30"  # Fallback image
@@ -127,10 +135,10 @@ page = option_menu(
 # Page 1: Tổng quan
 if page == "Tổng quan":
     st.title("Tổng quan Sentiment")
-    sentiment_by_match = df.groupby(['match', 'Sentiment']).size().reset_index(name='count')
-    fig = px.bar(sentiment_by_match, x='match', y='count', color='Sentiment', 
-                 barmode='group', title="Sentiment Distribution Across Matches")
-    st.plotly_chart(fig)
+    # sentiment_by_match = df.groupby(['match', 'Sentiment']).size().reset_index(name='count')
+    # fig = px.bar(sentiment_by_match, x='match', y='count', color='Sentiment', 
+    #              barmode='group', title="Sentiment Distribution Across Matches")
+    # st.plotly_chart(fig)
 
 # Page 2: Sentiment Trận đấu
 elif page == "Sentiment Trận đấu":
@@ -140,7 +148,7 @@ elif page == "Sentiment Trận đấu":
 elif page == "Chi tiết Post & Comment":
     st.title("Chi tiết Bài Post & Comment")
     st.subheader("Danh sách Post và Comment")
-    st.dataframe(df[['post_id', 'comment_id', 'comment', 'comment_author', 'Sentiment', 'Compound']])
+    # st.dataframe(df[['post_id', 'comment_id', 'comment', 'comment_author', 'Sentiment', 'Compound']])
 
 # Page 4: Sentiment Đội Bóng
 elif page == "Sentiment Đội Bóng":
