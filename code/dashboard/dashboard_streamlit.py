@@ -7,7 +7,7 @@ import team_sentiment_page
 import base64
 import os
 from pathlib import Path
-
+import overview_page
 
 # Load the sentiment dataset with caching
 @st.cache_data
@@ -39,83 +39,83 @@ if 'matchday' not in dfs.columns:
     st.error("Error: 'matchday' column not found in the dataset. Available columns: " + str(dfs.columns.tolist()))
     st.stop()
 
-def add_snowfall_effect():
-    # Check if the image exists
+# def add_snowfall_effect():
+#     # Check if the image exists
     
-    image_path = Path("Reddit_Sentiment_Analysis/code/dashboard/Suomi.png")
+#     image_path = Path("Reddit_Sentiment_Analysis/code/dashboard/Suomi.png")
      
-    if not os.path.exists(image_path):
-        st.warning("Image 'Suomi.png' not found. Snowfall effect will use a default image.")
-        snowflake_image = "https://via.placeholder.com/30"  # Fallback image
-    else:
-        with open(image_path, "rb") as image_file:
-            encoded = base64.b64encode(image_file.read()).decode()
-        snowflake_image = f"data:image/png;base64,{encoded}"
+#     if not os.path.exists(image_path):
+#         st.warning("Image 'Suomi.png' not found. Snowfall effect will use a default image.")
+#         snowflake_image = "https://via.placeholder.com/30"  # Fallback image
+#     else:
+#         with open(image_path, "rb") as image_file:
+#             encoded = base64.b64encode(image_file.read()).decode()
+#         snowflake_image = f"data:image/png;base64,{encoded}"
 
-    # CSS-only snowfall effect
-    st.markdown(
-        f"""
-        <style>
-        .snowflake-container {{
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }}
-        .snowflake {{
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: url('{snowflake_image}') no-repeat center center;
-            background-size: contain;
-            opacity: 0.8;
-            animation: fall linear infinite;
-        }}
-        .stApp {{
-            background: #1E1E1E;  /* Dark background to match the theme */
-            color: white;
-        }}
-        @keyframes fall {{
-            0% {{ opacity: 0; transform: translateY(-20vh); }}
-            20% {{ opacity: 1; }}
-            100% {{ opacity: 0; transform: translateY(100vh); }}
-        }}
-        /* Define multiple snowflakes with different positions and delays */
-        .snowflake:nth-child(1) {{ left: 5%; animation-duration: 10s; animation-delay: 0s; }}
-        .snowflake:nth-child(2) {{ left: 15%; animation-duration: 12s; animation-delay: 1s; }}
-        .snowflake:nth-child(3) {{ left: 25%; animation-duration: 8s; animation-delay: 2s; }}
-        .snowflake:nth-child(4) {{ left: 35%; animation-duration: 11s; animation-delay: 0s; }}
-        .snowflake:nth-child(5) {{ left: 45%; animation-duration: 9s; animation-delay: 3s; }}
-        .snowflake:nth-child(6) {{ left: 55%; animation-duration: 10s; animation-delay: 1s; }}
-        .snowflake:nth-child(7) {{ left: 65%; animation-duration: 13s; animation-delay: 2s; }}
-        .snowflake:nth-child(8) {{ left: 75%; animation-duration: 7s; animation-delay: 0s; }}
-        .snowflake:nth-child(9) {{ left: 85%; animation-duration: 10s; animation-delay: 3s; }}
-        .snowflake:nth-child(10) {{ left: 95%; animation-duration: 12s; animation-delay: 1s; }}
-        </style>
-        <div class="snowflake-container">
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-            <div class="snowflake"></div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+#     # CSS-only snowfall effect
+#     st.markdown(
+#         f"""
+#         <style>
+#         .snowflake-container {{
+#             position: fixed;
+#             top: 0;
+#             left: 0;
+#             width: 100%;
+#             height: 100%;
+#             pointer-events: none;
+#             z-index: 9999;
+#         }}
+#         .snowflake {{
+#             position: absolute;
+#             width: 30px;
+#             height: 30px;
+#             background: url('{snowflake_image}') no-repeat center center;
+#             background-size: contain;
+#             opacity: 0.8;
+#             animation: fall linear infinite;
+#         }}
+#         .stApp {{
+#             background: #1E1E1E;  /* Dark background to match the theme */
+#             color: white;
+#         }}
+#         @keyframes fall {{
+#             0% {{ opacity: 0; transform: translateY(-20vh); }}
+#             20% {{ opacity: 1; }}
+#             100% {{ opacity: 0; transform: translateY(100vh); }}
+#         }}
+#         /* Define multiple snowflakes with different positions and delays */
+#         .snowflake:nth-child(1) {{ left: 5%; animation-duration: 10s; animation-delay: 0s; }}
+#         .snowflake:nth-child(2) {{ left: 15%; animation-duration: 12s; animation-delay: 1s; }}
+#         .snowflake:nth-child(3) {{ left: 25%; animation-duration: 8s; animation-delay: 2s; }}
+#         .snowflake:nth-child(4) {{ left: 35%; animation-duration: 11s; animation-delay: 0s; }}
+#         .snowflake:nth-child(5) {{ left: 45%; animation-duration: 9s; animation-delay: 3s; }}
+#         .snowflake:nth-child(6) {{ left: 55%; animation-duration: 10s; animation-delay: 1s; }}
+#         .snowflake:nth-child(7) {{ left: 65%; animation-duration: 13s; animation-delay: 2s; }}
+#         .snowflake:nth-child(8) {{ left: 75%; animation-duration: 7s; animation-delay: 0s; }}
+#         .snowflake:nth-child(9) {{ left: 85%; animation-duration: 10s; animation-delay: 3s; }}
+#         .snowflake:nth-child(10) {{ left: 95%; animation-duration: 12s; animation-delay: 1s; }}
+#         </style>
+#         <div class="snowflake-container">
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#             <div class="snowflake"></div>
+#         </div>
+#         """,
+#         unsafe_allow_html=True
+#     )
 
 # Apply the snowfall effect with error handling
-try:
-    add_snowfall_effect()
-except Exception as e:
-    st.warning(f"Failed to apply snowfall effect: {str(e)}. Continuing without the effect.")
+# try:
+#     add_snowfall_effect()
+# except Exception as e:
+#     st.warning(f"Failed to apply snowfall effect: {str(e)}. Continuing without the effect.")
 
 # Create navigation menu
 page = option_menu(
@@ -135,10 +135,7 @@ page = option_menu(
 # Page 1: Tổng quan
 if page == "Tổng quan":
     st.title("Tổng quan Sentiment")
-    # sentiment_by_match = df.groupby(['match', 'Sentiment']).size().reset_index(name='count')
-    # fig = px.bar(sentiment_by_match, x='match', y='count', color='Sentiment', 
-    #              barmode='group', title="Sentiment Distribution Across Matches")
-    # st.plotly_chart(fig)
+    overview_page.display_overview()
 
 # Page 2: Sentiment Trận đấu
 elif page == "Sentiment Trận đấu":

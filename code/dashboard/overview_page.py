@@ -3,17 +3,19 @@ import pandas as pd
 from wordcloud import WordCloud
 import plotly.express as px
 import matplotlib.pyplot as plt
-
+from pathlib import Path
 # Hàm tải dữ liệu với caching
 @st.cache_data
 def load_match_data():
-    df_match = pd.read_csv(r"D:\Desktop\tap tanh hoc code\.vscode\DAP\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_match_data.csv")
+    path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_match_data.csv")
+    df_match = pd.read_csv(path)
     df_match["Date"] = pd.to_datetime(df_match["Date"])
     return df_match
 
 @st.cache_data
 def load_sentiment_data():
-    df_sentiment = pd.read_csv(r"D:\Desktop\tap tanh hoc code\.vscode\DAP\Reddit_Sentiment_Analysis\dataframe\source_dashboard\nonan_goodformat_comment_data.csv")
+    path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_comment_data.csv")
+    df_sentiment = pd.read_csv(path)
     df_sentiment["match_time"] = pd.to_datetime(df_sentiment["match_time"])
     return df_sentiment
 
@@ -220,5 +222,5 @@ def display_overview():
             st.warning("Không tìm thấy comment nào chứa từ khóa này.")
 
 
-if __name__ == "__main__":
-    display_overview()
+
+    
