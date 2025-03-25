@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 from streamlit_option_menu import option_menu
 import match_page
-import team_sentiment_page  # Import the new module
+import team_sentiment_page
 import base64
 import os
 
