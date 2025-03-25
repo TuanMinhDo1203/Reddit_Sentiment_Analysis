@@ -24,8 +24,8 @@ def extract_important_events(comments):
     if not filtered_comments:
         return "Không có sự kiện quan trọng nào được ghi nhận."
 
-    text = " ".join(filtered_comments)[:1000]  # Giới hạn độ dài đầu vào
-    prompt = f"Tóm tắt các sự kiện quan trọng từ các bình luận bóng đá sau:\n{text}"
+    text = " ".join(filtered_comments)[:4000]  # Giới hạn độ dài đầu vào
+    prompt = f"Tóm tắt các sự kiện quan trọng từ các bình luận bóng đá sau:\n{text} ngắn gọn và súc tích."
     
     response = model.generate_content(prompt)
     return response.text
