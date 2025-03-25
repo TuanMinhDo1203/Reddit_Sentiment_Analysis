@@ -12,7 +12,7 @@ from pathlib import Path
 # Load the sentiment dataset with caching
 @st.cache_data
 def load_sentiment_data():
-    file_path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_comment_data.csv")
+    file_path = Path("Reddit_Sentiment_Analysis/code/source_dashboard/nonan_goodformat_comment_data.csv")
     df_sentiment = pd.read_csv(file_path)
     df_sentiment["match_time"] = pd.to_datetime(df_sentiment["match_time"])
     return df_sentiment
@@ -22,7 +22,7 @@ print(os.getcwd())  # In ra thư mục hiện tại
 # Load the match dataset with caching
 @st.cache_data
 def load_match_data():
-    file_path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_match_data.csv")
+    file_path = Path("Reddit_Sentiment_Analysis/code/source_dashboard/nonan_goodformat_match_data.csv")
     df_match = pd.read_csv(file_path)
     df_match["Date"] = pd.to_datetime(df_match["Date"])
     return df_match
@@ -42,10 +42,10 @@ if 'matchday' not in dfs.columns:
 def add_snowfall_effect():
     # Check if the image exists
     
-    image_path = Path("Reddit_Sentiment_Analysis/code/dashboard/Suomi.png")
+    image_path = Path("Reddit_Sentiment_Analysis/code/dashboard/ball.png")
      
     if not os.path.exists(image_path):
-        st.warning("Image 'Suomi.png' not found. Snowfall effect will use a default image.")
+        st.warning("Image not found. Snowfall effect will use a default image.")
         snowflake_image = "https://via.placeholder.com/30"  # Fallback image
     else:
         with open(image_path, "rb") as image_file:
