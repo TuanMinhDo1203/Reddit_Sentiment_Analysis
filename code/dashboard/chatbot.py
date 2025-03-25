@@ -5,9 +5,11 @@ import time
 from pathlib import Path
 import streamlit.components.v1 as components
 import google.generativeai as genai
-
+from dotenv import load_dotenv
+import os
 # Cấu hình API
-API_KEY = "ben"
+load_dotenv()
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash-latest")
