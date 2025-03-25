@@ -39,7 +39,7 @@ dfs = load_data()
 
 def add_snowfall_effect():
     # Check if the image exists
-    image_path = 'Filled.png'
+    image_path = 'Suomi.png'
     if not os.path.exists(image_path):
         st.warning("Image not found. Snowfall effect will use a default image.")
         snowflake_image = "https://via.placeholder.com/30"  # Fallback image
