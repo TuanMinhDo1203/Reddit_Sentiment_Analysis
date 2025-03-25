@@ -204,13 +204,13 @@ elif page == "Sentiment Đội Bóng":
         .modern-table th, .modern-table td {
             padding: 15px;
             text-align: center;
-            color: #FFFFFF;  /* Changed to white */
+            color: #FF694B;
             border-bottom: 1px solid #3A3A3A;
             transition: background-color 0.3s ease;
         }
         .modern-table th {
             background: linear-gradient(135deg, #4B1248, #7D2463);
-            color: #FF69B4;
+            color: #FFFFFF;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -227,17 +227,17 @@ elif page == "Sentiment Đội Bóng":
         }
         .modern-table .top1 {
             background: linear-gradient(135deg, #FFD700, #FFC107);
-            color: #FFFFFF;  /* Changed to white */
+            color: #FFFFFF;
             font-weight: 600;
         }
         .modern-table .top2 {
             background: linear-gradient(135deg, #C0C0C0, #B0B0B0);
-            color: #FFFFFF;  /* Changed to white */
+            color: #FFFFFF;
             font-weight: 600;
         }
         .modern-table .top3 {
             background: linear-gradient(135deg, #CD7F32, #B87333);
-            color: #FFFFFF;  /* Changed to white */
+            color: #FFFFFF;
             font-weight: 600;
         }
         </style>
@@ -303,7 +303,7 @@ elif page == "Sentiment Đội Bóng":
         st.write("Only one matchday available.")
         start_matchday, end_matchday = matchdays[0], matchdays[0]
 
-    # Requirement 1: Tổng hợp Sentiment theo Đội (Using Matplotlib with solid colors for all bars)
+    # Requirement 1: Tổng hợp Sentiment theo Đội (Using Matplotlib with image pattern for Positive bars)
     st.subheader("Tổng hợp Sentiment theo Đội")
     display_mode = st.radio("Hiển thị dưới dạng:", ("Số lượng", "Tỷ lệ phần trăm"))
     
@@ -324,6 +324,17 @@ elif page == "Sentiment Đội Bóng":
 
     team_sentiment, y_axis, y_title = compute_team_sentiment(team_data, display_mode)
 
+    # Load the image for the Positive bar
+    image_path = 'Filled.png'
+    try:
+        img = mpimg.imread(image_path)
+        # Ensure the image is in RGBA format
+        if img.shape[-1] != 4:
+            img = np.dstack((img, np.ones(img.shape[:2]) * 255))  # Add alpha channel if needed
+    except FileNotFoundError:
+        st.warning("Image 'anime_face_single.png' not found for Positive bars. Using default color instead.")
+        img = None
+
     # Create a Matplotlib figure for each team
     for team in selected_teams:
         team_subset = team_sentiment[team_sentiment['home_team'] == team]
@@ -335,15 +346,37 @@ elif page == "Sentiment Đội Bóng":
         bar_width = 0.8
         x_positions = np.arange(len(sentiments))
 
-        # Use solid colors for all bars
+        # Draw bars, using the image as a pattern for the Positive bar
         for i, (sentiment, value) in enumerate(zip(sentiments, values)):
-            color = '#EF553B' if sentiment == 'Negative' else '#636EFA' if sentiment == 'Neutral' else '#00CC96'
-            ax.bar(i, value, bar_width, color=color)
+            if sentiment == 'Positive' and img is not None:
+                # Create a texture from the image
+                bar = ax.bar(i, value, bar_width, color='white')  # Placeholder color
+                bar_height = bar[0].get_height()
+                bar_width_actual = bar[0].get_width()
+                bar_x = bar[0].get_x()
+                bar_y = bar[0].get_y()
+
+                # Calculate the number of image tiles needed to fill the bar
+                img_height, img_width = img.shape[:2]
+                bar_height_points = ax.transData.transform([(0, bar_height)])[0][1] - ax.transData.transform([(0, 0)])[0][1]
+                bar_width_points = ax.transData.transform([(bar_width_actual, 0)])[0][0] - ax.transData.transform([(0, 0)])[0][0]
+                aspect_ratio = img_width / img_height
+                tile_width = 30  # Width of each tile in pixels
+                tile_height = tile_width / aspect_ratio
+                num_tiles_x = int(bar_width_points / tile_width) + 1
+                num_tiles_y = int(bar_height_points / tile_height) + 1
+
+                # Create an extent for the image to fill the entire bar
+                extent = [bar_x, bar_x + bar_width_actual, 0, bar_height]
+                ax.imshow(img, extent=extent, aspect='auto', zorder=bar[0].zorder + 1)
+            else:
+                color = '#EF553B' if sentiment == 'Negative' else '#636EFA' if sentiment == 'Neutral' else '#00CC96'
+                ax.bar(i, value, bar_width, color=color)
 
         ax.set_xticks(x_positions)
         ax.set_xticklabels(sentiments)
-        ax.set_title(f"Sentiment Distribution for {team}").set_color('#FFFFFF')
-        ax.set_xlabel("Sentiment").set_color('#FF69B4')
+        ax.set_title(f"Sentiment Distribution for {team}").set_color('#FF694B')
+        ax.set_xlabel("Sentiment").set_color('#FF694B')
         ax.set_ylabel(y_title)
         ax.set_facecolor('#1E1E1E')  # Match the dark theme
         fig.patch.set_facecolor('#1E1E1E')
