@@ -4,7 +4,7 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
-
+from pathlib import Path
 def display_team_sentiment(dfs):
     # Debug: Check available columns
     required_columns = ['matchday', 'home_team', 'away_team', 'Sentiment', 'Compound']
@@ -188,7 +188,8 @@ def display_team_sentiment(dfs):
     team_sentiment, y_axis, y_title = compute_team_sentiment(team_data, display_mode)
 
     # Load the image for the Positive bar
-    image_path = 'Filled.png'
+    image_path = Path("Reddit_Sentiment_Analysis/code/dashboard/Filled.png")
+    
     try:
         img = mpimg.imread(image_path)
         # Ensure the image is in RGBA format
