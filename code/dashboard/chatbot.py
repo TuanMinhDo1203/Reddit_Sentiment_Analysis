@@ -53,10 +53,10 @@ def extract_player_summary(df, player_name):
         return f"Không có dữ liệu cho {player_name}."
 
     # Gộp tất cả bình luận thành một đoạn văn bản duy nhất
-    combined_text = " ".join(player_data["comment_text"].tolist())[:800]  # Giới hạn 4000 ký tự
+    combined_text = " ".join(player_data["comment_text"].tolist())[:3000]  # Giới hạn 4000 ký tự
 
     # Tạo prompt tổng quát thay vì theo từng vòng
-    prompt = f"Tóm tắt phong độ tổng quát của {player_name} trong mùa giải dựa trên các bình luận: {combined_text}"
+    prompt = f"Tóm tắt phong độ tổng quát của {player_name} trong mùa giải dựa trên các bình luận: {combined_text} "
     response = model.generate_content(prompt)
 
     return response.text
@@ -66,15 +66,15 @@ def compare_players(df, player1, player2):
     summary2 = extract_player_summary(df, player2)
 
     # Thống kê số lượng bình luận theo cảm xúc
-    def get_sentiment_stats(df, player_name):
-        player_data = df[
-            df["comment_text"].str.contains(player_name, case=False, na=False)
-        ]
-        sentiment_counts = player_data["Sentiment"].value_counts(normalize=True) * 100
-        return f"Tích cực: {sentiment_counts.get('Positive', 0):.1f}%, Trung lập: {sentiment_counts.get('Neutral', 0):.1f}%, Tiêu cực: {sentiment_counts.get('Negative', 0):.1f}%"
+    # def get_sentiment_stats(df, player_name):
+    #     player_data = df[
+    #         df["comment_text"].str.contains(player_name, case=False, na=False)
+    #     ]
+    #     sentiment_counts = player_data["Sentiment"].value_counts(normalize=True) * 100
+    #     return f"Tích cực: {sentiment_counts.get('Positive', 0):.1f}%, Trung lập: {sentiment_counts.get('Neutral', 0):.1f}%, Tiêu cực: {sentiment_counts.get('Negative', 0):.1f}%"
 
-    stats1 = get_sentiment_stats(df, player1)
-    stats2 = get_sentiment_stats(df, player2)
+    stats1 = extract_player_summary(df, player1)
+    stats2 = extract_player_summary(df, player2)
 
     prompt = f"""So sánh phong độ của {player1} và {player2} dựa trên nhận xét của fan:
     
@@ -99,11 +99,12 @@ def analyze_team_sentiment(df, team_name):
 
     if team_data.empty:
         return f"Không có dữ liệu về {team_name}."
-
-    sentiment_counts = team_data["Sentiment"].value_counts(normalize=True) * 100
-    stats = f"Tích cực: {sentiment_counts.get('Positive', 0):.1f}%, Trung lập: {sentiment_counts.get('Neutral', 0):.1f}%, Tiêu cực: {sentiment_counts.get('Negative', 0):.1f}%"
     
-    prompt = f"Fan nói gì về {team_name} dựa trên dữ liệu bình luận?\n{stats}"
+    combined_text = " ".join(team_data["comment_text"].tolist())[:4000]
+    # sentiment_counts = team_data["Sentiment"].value_counts(normalize=True) * 100
+    # stats = f"Tích cực: {sentiment_counts.get('Positive', 0):.1f}%, Trung lập: {sentiment_counts.get('Neutral', 0):.1f}%, Tiêu cực: {sentiment_counts.get('Negative', 0):.1f}%"
+    
+    prompt = f"Fan nói gì về {team_name} dựa trên dữ liệu bình luận?\n{combined_text}"
     response = model.generate_content(prompt)
     
     return response.text

@@ -8,11 +8,11 @@ import base64
 import os
 from pathlib import Path
 import overview_page
-
+import chatbot
 # Load the sentiment dataset with caching
 @st.cache_data
 def load_sentiment_data():
-    file_path = Path("Reddit_Sentiment_Analysis/code/source_dashboard/nonan_goodformat_comment_data.csv")
+    file_path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_comment_data.csv")
     df_sentiment = pd.read_csv(file_path)
     df_sentiment["match_time"] = pd.to_datetime(df_sentiment["match_time"])
     return df_sentiment
@@ -22,7 +22,7 @@ print(os.getcwd())  # In ra thư mục hiện tại
 # Load the match dataset with caching
 @st.cache_data
 def load_match_data():
-    file_path = Path("Reddit_Sentiment_Analysis/code/source_dashboard/nonan_goodformat_match_data.csv")
+    file_path = Path("Reddit_Sentiment_Analysis/dataframe/source_dashboard/nonan_goodformat_match_data.csv")
     df_match = pd.read_csv(file_path)
     df_match["Date"] = pd.to_datetime(df_match["Date"])
     return df_match
@@ -33,7 +33,7 @@ st.set_page_config(page_title="Football Sentiment Analysis", layout="wide")
 df = load_sentiment_data()
 df_match = load_match_data()
 dfs = load_sentiment_data()
-
+chatbot.football_chatbot(df)
 # Debug: Check if 'matchday' column exists
 if 'matchday' not in dfs.columns:
     st.error("Error: 'matchday' column not found in the dataset. Available columns: " + str(dfs.columns.tolist()))
