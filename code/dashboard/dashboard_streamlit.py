@@ -141,8 +141,6 @@ if page == "Tổng quan":
 elif page == "Sentiment Trận đấu":
     match_page.display_match_sentiment()
 
-
-
 # Page 3: Sentiment Đội Bóng
 elif page == "Sentiment Đội Bóng":
     team_sentiment_page.display_team_sentiment(dfs)
