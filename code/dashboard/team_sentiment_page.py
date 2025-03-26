@@ -4,7 +4,9 @@ import plotly.express as px
 import numpy as np
 from datetime import datetime
 from typing import Dict, Tuple
-
+import matplotlib.pyplot as plt
+import re
+from wordcloud import WordCloud
 # Constants for consistent styling
 COLOR_POSITIVE = '#00CC96'
 COLOR_NEGATIVE = '#EF553B'
@@ -295,14 +297,7 @@ def display_team_sentiment(dfs: pd.DataFrame) -> None:
     st.title("EPL Team Sentiment Analysis")
 
 
-    # Display mode selector
-    display_mode = st.radio(
-        "Display mode:", 
-        ("Count", "Percentage"), 
-        horizontal=True,
-        key='display_mode'
-    )
-    display_mode = "Tỷ lệ phần trăm" if display_mode == "Percentage" else "Số lượng"
+    
 
     # Create ranking table
     create_ranking_table(dfs)  # Using full dataset for ranking
@@ -349,7 +344,7 @@ def display_team_sentiment(dfs: pd.DataFrame) -> None:
     
 
     # Team performance metrics
-    st.subheader("Team Performance Metrics")
+    
     if not team_data.empty:
         # Calculate basic metrics
         metrics = team_data.groupby('selected_team').agg({
@@ -375,75 +370,125 @@ def display_team_sentiment(dfs: pd.DataFrame) -> None:
 
     # Team sentiment analysis
     st.subheader("Team Sentiment Analysis")
-    for team in selected_teams:
-        st.markdown(f"#### {team}")
-        
-        team_subset = team_data[team_data['selected_team'] == team]
-        
-        if not team_subset.empty:
-            col1, col2 = st.columns([2, 1])
-            with col1:
+
+    # Display mode selector
+    display_mode = st.radio(
+        "Display mode:", 
+        ("Count", "Percentage"), 
+        horizontal=True,
+        key='display_mode'
+    )
+    display_mode = "Tỷ lệ phần trăm" if display_mode == "Percentage" else "Số lượng"
+
+    num_teams = len(selected_teams)
+    cols = st.columns(num_teams)
+    if "wordclouds" not in st.session_state:
+        st.session_state.wordclouds = {}
+    for idx, team in enumerate(selected_teams):
+        with cols[idx]:
+            st.markdown(f"### {team}")
+            team_subset = team_data[team_data['selected_team'] == team]
+
+            if not team_subset.empty:
                 fig_bar = create_sentiment_chart(team_subset, team, display_mode)
                 st.plotly_chart(fig_bar, use_container_width=True)
-                display_sentiment_counts(team_subset, display_mode)
-                
-            with col2:
+
                 fig_pie = create_pie_chart(team_subset, team)
                 st.plotly_chart(fig_pie, use_container_width=True)
-        else:
-            st.warning(f"No data available for {team}")
 
-    # Matchday analysis
-    st.subheader(f"Matchday Analysis ({start_matchday}-{end_matchday})")
+                # 🔹 Biểu đồ đường (Sentiment Over Matchdays)
+                 # Biểu đồ cảm xúc theo Matchday (chỉ cho đội này)
+                st.markdown(f"#### Sentiment by Matchday - {team}")
+                fig_matchday = px.bar(
+                    team_subset.groupby(['matchday', 'Sentiment']).size().reset_index(name='count'),
+                    x='matchday',
+                    y='count',
+                    color='Sentiment',
+                    title=f"Sentiment by Matchday - {team}",
+                    color_discrete_map={
+                        'Positive': COLOR_POSITIVE,
+                        'Negative': COLOR_NEGATIVE,
+                        'Neutral': COLOR_NEUTRAL
+                    },
+                    barmode='group'
+                )
+                fig_matchday.update_layout(
+                    plot_bgcolor=COLOR_BACKGROUND,
+                    paper_bgcolor=COLOR_BACKGROUND,
+                    font=dict(color='white'),
+                    height=400
+                )
+                st.plotly_chart(fig_matchday, use_container_width=True)
+
+                # Xu hướng cảm xúc theo Matchday (chỉ cho đội này)
+                st.markdown(f"#### Sentiment Trend - {team}")
+                fig_trend = px.line(
+                    team_subset.groupby(['matchday', 'Sentiment']).size().reset_index(name='count'),
+                    x='matchday',
+                    y='count',
+                    color='Sentiment',
+                    title=f"Sentiment Trend Over Matchdays - {team}",
+                    color_discrete_map={
+                        'Positive': COLOR_POSITIVE,
+                        'Negative': COLOR_NEGATIVE,
+                        'Neutral': COLOR_NEUTRAL
+                    },
+                    markers=True
+                )
+                fig_trend.update_layout(
+                    plot_bgcolor=COLOR_BACKGROUND,
+                    paper_bgcolor=COLOR_BACKGROUND,
+                    font=dict(color='white')
+                )
+                st.plotly_chart(fig_trend, use_container_width=True)
+                # WordCloud
+                st.markdown(f"#### WordCloud - {team}")
+                # text_data = " ".join(team_subset['comment_text'].astype(str))
+                if team not in st.session_state.wordclouds:
+                    text_data = " ".join(team_subset["comment_text"].dropna().astype(str))
+
+                    wordcloud = WordCloud(
+                        width=800,
+                        height=400,
+                        background_color="black",  # Nền tối
+                        colormap="coolwarm",  # Phối màu đẹp hơn
+                        contour_color="white",  # Viền trắng
+                        contour_width=1,
+                        max_words=100,  # Giới hạn số từ
+                        collocations=False  # Tránh ghép từ không mong muốn
+                    ).generate(text_data)
+                    st.session_state.wordclouds[team] = wordcloud
+                
+                # 🔍 Tìm kiếm bình luận chứa từ khóa
+                if team in st.session_state.wordclouds:
+                    fig, ax = plt.subplots(figsize=(6, 3))
+                    ax.imshow(st.session_state.wordclouds[team], interpolation='bilinear')
+                    ax.axis("off")
+                    st.pyplot(fig)
+                else:
+                    st.warning(f"Không có dữ liệu để tạo WordCloud cho {team}.")
+
+
+                clicked_word = st.text_input(f"🔍 Tìm bình luận có từ khoá ({team}):", key=f"search_{team}")
+
+                if clicked_word:
+                    filtered_comments = team_subset[
+                        team_subset["comment_text"].str.contains(rf"\b{re.escape(clicked_word)}\b", case=False, na=False)
+                    ]["comment_text"]
+
+                    total_comments = len(filtered_comments)
+
+                    if total_comments > 0:
+                        st.subheader(f"📜 Bình luận của {team} chứa từ '{clicked_word}' ({total_comments} bình luận)")
+                        st.dataframe(pd.DataFrame({"Bình luận": filtered_comments}), height=400)
+                    else:
+                        st.warning(f"Không tìm thấy bình luận nào chứa từ '{clicked_word}' cho {team}.")
+
+            else:
+                st.warning("No data")
     
-    if not team_data.empty:
-        # Sentiment by matchday
-        fig_matchday = px.bar(
-            team_data.groupby(['matchday', 'Sentiment']).size().reset_index(name='count'),
-            x='matchday',
-            y='count',
-            color='Sentiment',
-            title="Sentiment by Matchday",
-            color_discrete_map={
-                'Positive': COLOR_POSITIVE,
-                'Negative': COLOR_NEGATIVE,
-                'Neutral': COLOR_NEUTRAL
-            },
-            barmode='group'
-        )
-        fig_matchday.update_layout(
-            plot_bgcolor=COLOR_BACKGROUND,
-            paper_bgcolor=COLOR_BACKGROUND,
-            font=dict(color='white'),
-            height=500
-        )
-        st.plotly_chart(fig_matchday, use_container_width=True)
-        
-        # Sentiment trend over matchdays
-        st.subheader("Sentiment Trend")
-        fig_trend = px.line(
-            team_data.groupby(['matchday', 'Sentiment']).size().reset_index(name='count'),
-            x='matchday',
-            y='count',
-            color='Sentiment',
-            title="Sentiment Trend Over Matchdays",
-            color_discrete_map={
-                'Positive': COLOR_POSITIVE,
-                'Negative': COLOR_NEGATIVE,
-                'Neutral': COLOR_NEUTRAL
-            },
-            markers=True
-        )
-        fig_trend.update_layout(
-            plot_bgcolor=COLOR_BACKGROUND,
-            paper_bgcolor=COLOR_BACKGROUND,
-            font=dict(color='white')
-        )
-        st.plotly_chart(fig_trend, use_container_width=True)
-    else:
-        st.warning("No data available for the selected filters")
 
-if __name__ == "__main__":
-    setup_page()
-    dfs = load_data()
-    display_team_sentiment(dfs)
+# if __name__ == "__main__":
+#     setup_page()
+#     dfs = load_data()
+#     display_team_sentiment(dfs)

@@ -120,8 +120,8 @@ if 'matchday' not in dfs.columns:
 # Create navigation menu
 page = option_menu(
     menu_title=None,
-    options=["Tổng quan", "Sentiment Trận đấu", "Chi tiết Post & Comment", "Sentiment Đội Bóng"],
-    icons=["house", "bar-chart", "chat-dots", "soccer"],
+    options=["Tổng quan", "Sentiment Trận đấu",  "Sentiment Đội Bóng"],
+    icons=["house", "bar-chart",  "soccer"],
     menu_icon="cast",
     default_index=0,
     orientation="horizontal",
@@ -141,12 +141,8 @@ if page == "Tổng quan":
 elif page == "Sentiment Trận đấu":
     match_page.display_match_sentiment()
 
-# Page 3: Chi tiết Post & Comment
-elif page == "Chi tiết Post & Comment":
-    st.title("Chi tiết Bài Post & Comment")
-    st.subheader("Danh sách Post và Comment")
-    # st.dataframe(df[['post_id', 'comment_id', 'comment', 'comment_author', 'Sentiment', 'Compound']])
 
-# Page 4: Sentiment Đội Bóng
+
+# Page 3: Sentiment Đội Bóng
 elif page == "Sentiment Đội Bóng":
     team_sentiment_page.display_team_sentiment(dfs)
