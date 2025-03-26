@@ -197,20 +197,23 @@ def display_overview():
         filtered_df = df_sentiment[df_sentiment['comment_text'].str.lower().str.contains(search_term, na=False)]
 
         if not filtered_df.empty:
-            # Phân loại Positive (Compound > 0) và Negative (Compound < 0)
+            # Phân loại Positive (Compound > 0), Negative (Compound < 0), và Neutral (Compound == 0)
             positive_comments = filtered_df[filtered_df['Compound'] > 0]
             negative_comments = filtered_df[filtered_df['Compound'] < 0]
+            neutral_comments = filtered_df[filtered_df['Compound'] == 0]
 
             # Chọn chế độ sắp xếp
             if sort_mode == "Compound Score":
                 positive_comments = positive_comments.sort_values(by='Compound', ascending=False)
                 negative_comments = negative_comments.sort_values(by='Compound', ascending=True)
+                neutral_comments = neutral_comments.sort_values(by='Compound', ascending=False)
             else:
                 positive_comments = positive_comments.sort_values(by='comment_score', ascending=False)
                 negative_comments = negative_comments.sort_values(by='comment_score', ascending=False)
+                neutral_comments = neutral_comments.sort_values(by='comment_score', ascending=False)
 
             # Hiển thị bảng kết quả
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 st.subheader("📈 Positive Comments")
                 st.dataframe(positive_comments[['comment_text', 'Compound', 'comment_score']].reset_index(drop=True), height=300)
@@ -218,6 +221,10 @@ def display_overview():
             with col2:
                 st.subheader("📉 Negative Comments")
                 st.dataframe(negative_comments[['comment_text', 'Compound', 'comment_score']].reset_index(drop=True), height=300)
+
+            with col3:
+                st.subheader("😐 Neutral Comments")
+                st.dataframe(neutral_comments[['comment_text', 'Compound', 'comment_score']].reset_index(drop=True), height=300)
         else:
             st.warning("Không tìm thấy comment nào chứa từ khóa này.")
 
