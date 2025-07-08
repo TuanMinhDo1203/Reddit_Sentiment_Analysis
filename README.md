@@ -26,5 +26,5 @@ This project aims to analyze public sentiment from Reddit posts related to the E
 
 ## 📸 Dashboard Screenshot
 
-![Dashboard Screenshot](images/dashboard.png)
+![Dashboard Screenshot](06a08275-0ac9-4139-9fe7-1d82edab3b83.jfif)
 
