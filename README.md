@@ -24,9 +24,3 @@ This project aims to analyze public sentiment from Reddit posts related to the E
 - Streamlit
 - Hugging Face Transformers (BERT)
 
-## 🚀 How to Run
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/TuanMinhDo1203/Reddit_Sentiment_Analysis.git
-   cd Reddit_Sentiment_Analysis
