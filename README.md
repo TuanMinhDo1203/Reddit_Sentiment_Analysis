@@ -24,3 +24,6 @@ This project aims to analyze public sentiment from Reddit posts related to the E
 - Streamlit
 - Hugging Face Transformers (BERT)
 
+## DEMO
+
+![Uploading image.png…]()
