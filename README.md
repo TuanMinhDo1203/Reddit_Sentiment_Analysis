@@ -26,4 +26,6 @@ This project aims to analyze public sentiment from Reddit posts related to the E
 
 ## DEMO
 
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/2b0a1f86-fd64-469e-8048-ceca2c603247)
+
+
